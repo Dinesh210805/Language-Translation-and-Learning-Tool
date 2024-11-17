@@ -1,0 +1,9 @@
+streamlit==1.26.0
+pandas==1.5.3
+numpy==1.23.5
+Pillow==9.5.0
+pytesseract==0.3.10
+requests==2.31.0
+python-dotenv==1.0.0
+plotly==5.16.1
+streamlit-option-menu==0.3.3
