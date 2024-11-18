@@ -1,4 +1,3 @@
-Let me help you create a comprehensive 
 
 README.md
 
