@@ -56,18 +56,9 @@ LANGUAGES = {
     "Tamil": "ta"  # Add Tamil language
 }
 
-# Define suitable models for translation tasks
-MODEL_CHOICES = [
-    "llama3-groq-70b-8192-tool-use-preview",
-    "llama3-groq-8b-8192-tool-use-preview",
-    "llama3-70b-8192",
-    "llama3-8b-8192"
-]
-
 class GroqTranslator:
-    def __init__(self, api_key: str, model: str):
+    def __init__(self, api_key: str):
         self.api_key = api_key
-        self.model = model
         self.base_url = "https://api.groq.com/openai/v1/chat/completions"
         self.headers = {
             "Authorization": f"Bearer {api_key}",
@@ -99,7 +90,7 @@ class GroqTranslator:
                 self.base_url,
                 headers=self.headers,
                 json={
-                    "model": self.model,
+                    "model": "llama3-groq-70b-8192-tool-use-preview",
                     "messages": [{"role": "user", "content": prompt}],
                     "temperature": 0.7,
                     "max_tokens": 2000
@@ -176,7 +167,7 @@ class UserProgressTracker:
 
 def initialize_session_state():
     defaults = {
-        'translator': GroqTranslator(GROQ_API_KEY, MODEL_CHOICES[0]),
+        'translator': GroqTranslator(GROQ_API_KEY),
         'progress': UserProgressTracker(),
         'translation_history': [],
         'current_quiz': None,
@@ -199,8 +190,7 @@ def initialize_session_state():
             'voice_type': 'default',
             'rate': 1.0,
             'pitch': 1.0
-        },
-        'selected_model': MODEL_CHOICES[0]
+        }
     }
     
     for key, value in defaults.items():
@@ -1086,9 +1076,6 @@ def translation_interface():
                         st.session_state.text_to_translate = example
                         st.rerun()  # Changed from experimental_rerun
 
-    # Add model selection dropdown
-    st.selectbox("Select Model:", MODEL_CHOICES, key='selected_model')
-
     # Enhanced translation display
     if text_to_translate:
         try:
@@ -1665,10 +1652,10 @@ def create_nav_menu():
         styles={
             "container": {
                 "padding": "0!important",
-                "background-color": "#1a1a1a",
+                "background-color": "#1a1a1a!important",  # Added !important
                 "position": "sticky",
                 "top": "0",
-                "z-index": "999"
+                "z-index": "9999"  # Increased z-index
             },
             "icon": {
                 "color": "#4A90E2",
@@ -1795,19 +1782,35 @@ def main():
         if 'achievement_system' not in st.session_state:
             st.session_state.achievement_system = AchievementSystem()
         
+        # Move navigation menu before achievements check
+        selected = create_nav_menu()
+        
         # Check for new achievements
         new_achievements = st.session_state.achievement_system.check_achievements(st.session_state.progress)
         if new_achievements:
-            for achievement_id in new_achievements:
-                achievement = st.session_state.achievement_system.achievements[achievement_id]
-                st.balloons()
-                st.success(f"🎉 New Achievement Unlocked: {achievement['name']} - {achievement['desc']}")
+            # Create a container for achievements that doesn't interfere with navbar
+            with st.container():
+                for achievement_id in new_achievements:
+                    achievement = st.session_state.achievement_system.achievements[achievement_id]
+                    st.markdown("""
+                        <div style="position: fixed; 
+                                bottom: 20px; 
+                                right: 20px; 
+                                background: linear-gradient(135deg, #4A90E2 0%, #1E5C9B 100%);
+                                padding: 1rem;
+                                border-radius: 10px;
+                                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                                z-index: 1000;
+                                animation: slideIn 0.5s ease-out;">
+                            <h4 style="margin:0">🎉 Achievement Unlocked!</h4>
+                            <p style="margin:0">{} - {}</p>
+                        </div>
+                    """.format(achievement['name'], achievement['desc']), unsafe_allow_html=True)
+                    st.balloons()
         
         display_sidebar_metrics()
         
-        # Use the new navigation menu
-        selected = create_nav_menu()
-        
+        # Handle page selection
         if selected == "Translate":
             translation_interface()
         elif selected == "Practice":
