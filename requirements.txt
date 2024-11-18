@@ -14,6 +14,6 @@ streamlit-card>=0.0.4
 streamlit-extras>=0.2.7
 streamlit-lottie>=0.0.3
 streamlit-option-menu>=0.3.2
-streamlit-toggle>=0.1.1
+streamlit-toggle-switch>=1.0.0  # Updated version specification
 keyboard>=0.13.5
 gTTS>=2.3.1
