@@ -38,6 +38,3 @@ python-json-logger>=2.0.7
 # Ensure Tesseract-OCR is installed and in PATH
 # Install PyAudio wheel if pip install fails
 
-[server]
-enableXsrfProtection = false
-enableCORS = false
