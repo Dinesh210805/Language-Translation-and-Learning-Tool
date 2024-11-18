@@ -1,7 +1,4 @@
 
-README.md
-
- for your LinguaLearn Pro application:
 
 # LinguaLearn Pro 🌍
 
