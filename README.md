@@ -137,7 +137,7 @@ This project is licensed under the MIT License
 
 ## Support
 
-For support, email support@lingualean.com or create an issue in the repository.
+For support, email dinesh210805@gmail.com or create an issue in the repository.
 
 ---
 Built with ❤️ by LinguaLearn Pro Team
