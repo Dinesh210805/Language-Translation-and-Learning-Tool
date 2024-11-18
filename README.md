@@ -142,4 +142,3 @@ For support, email dinesh210805@gmail.com or create an issue in the repository.
 ---
 Built with ❤️ by LinguaLearn Pro Team
 
-Similar code found with 3 license types
