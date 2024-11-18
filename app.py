@@ -21,7 +21,6 @@ from streamlit_lottie import st_lottie
 import requests
 from gtts import gTTS
 import base64
-from streamlit_toggle import st_toggle_switch
 import streamlit_authenticator as stauth
 import speech_recognition as sr
 from io import BytesIO
@@ -177,7 +176,7 @@ def initialize_session_state():
         'chat_language': "English",
         'questions_answered': 0,
         'quiz_score': 0,
-        'keyboard_shortcuts_enabled': True,
+        'keyboard_shortcuts_enabled': True,  # Now using regular checkbox
         'translation_result': None,
         'text_to_translate': "",
         'audio_cache': {},
