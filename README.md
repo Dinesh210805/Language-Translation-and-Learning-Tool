@@ -51,23 +51,25 @@ GROQ_API_KEY=your_api_key_here
 ## Dependencies
 
 ```txt
-streamlit==1.32.0
-pandas==2.2.1
-numpy==1.26.4
-Pillow==10.2.0
-pytesseract==0.3.10
-python-dotenv==1.0.1
-streamlit-option-menu==0.3.12
-streamlit-card==1.0.0
-streamlit-extras==0.3.6
-streamlit-lottie==0.0.5
-streamlit-toggle==0.1.1
-streamlit-authenticator==0.3.1
-gTTS==2.5.1
-SpeechRecognition==3.10.1
-pyaudio>=0.2.13
-keyboard==0.13.5
-pyperclip==1.8.2
+numpy>=1.23.0
+pandas>=1.5.0
+Pillow>=9.0.0
+plotly>=5.13.0
+python-dateutil>=2.8.2
+python-dotenv>=0.21.0
+pytesseract>=0.3.10
+pyperclip>=1.8.2
+requests>=2.28.0
+SpeechRecognition>=3.10.0
+streamlit>=1.24.0
+streamlit-authenticator>=0.2.2
+streamlit-card>=0.0.4
+streamlit-extras>=0.2.7
+streamlit-lottie>=0.0.3
+streamlit-option-menu>=0.3.2
+streamlit-toggle-switch>=1.0.0  # Updated version specification
+keyboard>=0.13.5
+gTTS>=2.3.1
 ```
 
 ## Usage
