@@ -26,6 +26,27 @@ import speech_recognition as sr
 from io import BytesIO
 import pyperclip
 import keyboard
+from voice_translation import voice_translation_interface
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Import learning-related modules from learning.py
+try:
+    from learning import (
+        LANGUAGE_COURSES,
+        LESSON_CONTENT,
+        LanguageLearningSystem,
+        embed_youtube_video,
+        learning_interface,
+        show_lesson_interface,
+        generate_lesson_summary
+    )
+except ImportError as e:
+    logger.error(f"Failed to import learning modules: {str(e)}")
+    LANGUAGE_COURSES = {}
+    LESSON_CONTENT = {}
 
 # Load environment variables
 load_dotenv()
@@ -35,9 +56,10 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Initialize Groq API key
+#   GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
 GROQ_API_KEY = "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"
 if not GROQ_API_KEY:
-    st.error("Please set your GROQ_API_KEY in the environment variables.")
+    st.error("Please set your GROQ_API_KEY in .streamlit/secrets.toml")
     st.stop()
 
 # Supported languages
@@ -62,6 +84,20 @@ class GroqTranslator:
         self.headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json"
+        }
+        # Add languages attribute
+        self.languages = {
+            "English": "en",
+            "Spanish": "es",
+            "French": "fr",
+            "German": "de",
+            "Italian": "it",
+            "Portuguese": "pt",
+            "Chinese": "zh",
+            "Japanese": "ja",
+            "Korean": "ko",
+            "Russian": "ru",
+            "Tamil": "ta"
         }
 
     def translate_with_context(self, text: str, source_lang: str, target_lang: str) -> Dict:
@@ -189,7 +225,12 @@ def initialize_session_state():
             'voice_type': 'default',
             'rate': 1.0,
             'pitch': 1.0
-        }
+        },
+        'learning_system': None,  # Add learning system to session state
+        'current_lesson': None,
+        'lesson_progress': {},
+        'audio_system_initialized': False,  # Add this line
+        'languages': LANGUAGES,  # Add this line
     }
     
     for key, value in defaults.items():
@@ -1427,15 +1468,15 @@ def history_interface():
         return
     
     for idx, entry in enumerate(reversed(st.session_state.translation_history)):
-        with st.expander(f"Translation {len(st.session_state.translation_history) - idx}", expanded=(idx == 0)):
             col1, col2 = st.columns(2)
-            
+            with col2:
+                st.markdown("### Translation")
             with col1:
                 st.markdown("### Original Text")
                 st.write(entry["source_text"])
-                st.caption(f"From {entry['source_lang']} to {entry['target_lang']}")
+            tab1, tab2, tab3 = st.tabs(["Grammar", "Cultural Notes", "Examples"])
             
-            with col2:
+            with tab1:
                 st.markdown("### Translation")
                 st.write(entry["result"]["translation"])
             
@@ -1643,10 +1684,10 @@ def create_nav_menu():
     setup_page_navigation()
     selected = option_menu(
         menu_title=None,
-        options=["Translate", "Practice", "Chat", "History", "Achievements"],
-        icons=["translate", "book", "chat-dots", "clock-history", "trophy"],
+        options=["Translate", "Voice", "Learn", "Practice", "Chat", "History", "Achievements"],  # Added "Voice"
+        icons=["translate", "mic", "book", "pencil", "chat-dots", "clock-history", "trophy"],  # Added mic icon
         menu_icon="cast",
-        default_index=list(["Translate", "Practice", "Chat", "History", "Achievements"]).index(st.session_state.current_page),
+        default_index=list(["Translate", "Voice", "Learn", "Practice", "Chat", "History", "Achievements"]).index(st.session_state.current_page),
         orientation="horizontal",
         styles={
             "container": {
@@ -1775,6 +1816,9 @@ def main():
         initialize_session_state()
         setup_audio_system()
         
+        # Make LANGUAGES available to voice_translation.py
+        global LANGUAGES
+        
         if st.session_state.keyboard_shortcuts_enabled:
             initialize_keyboard_shortcuts()
         
@@ -1812,6 +1856,19 @@ def main():
         # Handle page selection
         if selected == "Translate":
             translation_interface()
+        elif selected == "Voice":
+            voice_translation_interface()
+        elif selected == "Learn":
+            try:
+                if st.session_state.learning_system is None:
+                    st.session_state.learning_system = LanguageLearningSystem()
+                learning_interface()
+            except Exception as e:
+                logger.error(f"Learning interface error: {str(e)}")
+                st.error("Failed to load learning interface. Please try again.")
+                if st.button("Retry"):
+                    st.session_state.learning_system = None
+                    st.rerun()
         elif selected == "Practice":
             practice_interface()
         elif selected == "Chat":
